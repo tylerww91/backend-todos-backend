@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS todos CASCADE;
 
 CREATE TABLE users (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  email VARCHAR,
+  email VARCHAR UNIQUE,
   password_hash VARCHAR NOT NULL
 );
 
@@ -14,6 +14,6 @@ CREATE TABLE todos (
   user_id BIGINT,
   description VARCHAR NOT NULL,
   completed BOOLEAN NOT NULL DEFAULT(false),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   FOREIGN KEY (user_id) REFERENCES users(id)
 )
