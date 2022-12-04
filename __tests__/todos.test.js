@@ -50,7 +50,7 @@ describe('todos routes', () => {
     });
   });
 
-  it.only('GET /api/v1/todos should return the current user a list of their todos', async () => {
+  it('GET /api/v1/todos should return the current user a list of their todos', async () => {
     const [agent, user] = await registerAndLogin();
     const user2 = await UserService.create(mockUser2);
     const user1Todo = await Todo.insert({
@@ -69,6 +69,25 @@ describe('todos routes', () => {
       id: expect.any(String),
       completed: false,
       created_at: expect.any(String),
+    });
+  });
+
+  it.only('UPDATE /api/v1/todos/:id should update a todo marking it off as completed', async () => {
+    const [agent, user] = await registerAndLogin();
+    const todo = await Todo.insert({
+      description: 'buy milk',
+      user_id: user.id,
+    });
+
+    const resp = await agent
+      .put(`/api/v1/todos/${todo.id}`)
+      .send({ completed: true });
+    expect(resp.status).toBe(200);
+    expect(resp.body).toEqual({
+      ...todo,
+      completed: true,
+      created_at: expect.any(String),
+      user_id: user.id,
     });
   });
 });
