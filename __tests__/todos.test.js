@@ -72,7 +72,7 @@ describe('todos routes', () => {
     });
   });
 
-  it.only('UPDATE /api/v1/todos/:id should update a todo marking it off as completed', async () => {
+  it('UPDATE /api/v1/todos/:id should update a todo marking it off as completed', async () => {
     const [agent, user] = await registerAndLogin();
     const todo = await Todo.insert({
       description: 'buy milk',
@@ -89,5 +89,20 @@ describe('todos routes', () => {
       created_at: expect.any(String),
       user_id: user.id,
     });
+  });
+
+  it('DELETE /api/v1/todos/:id should delete a todo for from the users todo list if they are authenticated/authorized', async () => {
+    const [agent, user] = await registerAndLogin();
+    const todo = await Todo.insert({
+      description: 'drink milk',
+      user_id: user.id,
+    });
+
+    await agent.post('/api/v1/todos').send(todo);
+    const resp = await agent.delete(`/api/v1/todos/${todo.id}`);
+    expect(resp.status).toBe(200);
+
+    const newResp = await agent.get(`/api/v1/todos/${todo.id}`);
+    expect(newResp.status).toBe(404);
   });
 });
