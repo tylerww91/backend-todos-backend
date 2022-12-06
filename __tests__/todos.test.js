@@ -91,6 +91,19 @@ describe('todos routes', () => {
     });
   });
 
+  it('UPDATE /api/v1/todos/:id should return a 403 if a user attempts to update a todo that is not theirs', async () => {
+    const [agent] = await registerAndLogin();
+    const user2 = await UserService.create(mockUser2);
+    const user2Todo = await Todo.insert({
+      description: 'get this bread',
+      user_id: user2.id,
+    });
+    const resp = await agent
+      .put(`/api/v1/todos/${user2Todo.id}`)
+      .send({ completed: true });
+    expect(resp.status).toBe(403);
+  });
+
   it('DELETE /api/v1/todos/:id should delete a todo for from the users todo list if they are authenticated/authorized', async () => {
     const [agent, user] = await registerAndLogin();
     const todo = await Todo.insert({
